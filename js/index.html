@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jogo de Futebol</title>
+    <style>
+        body {
+            background-color: #00695c;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        select, button {
+            padding: 8px 16px;
+            margin: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        select {
+            background-color: white;
+            color: black;
+        }
+
+        button {
+            background-color: #00c853;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #009624;
+        }
+
+        .scoreboard {
+            background-color: #004d40;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            display: inline-block;
+            min-width: 450px;
+        }
+
+        .teams {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .team {
+            width: 150px;
+        }
+
+        .team img {
+            width: 80px;
+            height: 80px;
+            display: block;
+            margin: 0 auto 8px auto;
+        }
+
+        .vs {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffc107;
+        }
+
+        .timer {
+            font-size: 24px;
+            margin: 10px 0;
+        }
+
+        .log {
+            background-color: white;
+            color: black;
+            border-radius: 10px;
+            padding: 10px;
+            height: 200px;
+            overflow-y: auto;
+            text-align: left;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .score {
+            font-size: 40px;
+            font-weight: bold;
+            color: #ffeb3b;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>⚽ Jogo de Futebol ⚽</h1>
+
+    <div>
+        <select id="team1">
+            <option value="Brasil">🇧🇷 Brasil</option>
+            <option value="Argentina">🇦🇷 Argentina</option>
+            <option value="França">🇫🇷 França</option>
+            <option value="Alemanha">🇩🇪 Alemanha</option>
+            <option value="Espanha">🇪🇸 Espanha</option>
+            <option value="Inglaterra">🏴 Inglaterra</option>
+            <option value="Itália">🇮🇹 Itália</option>
+            <option value="Portugal">🇵🇹 Portugal</option>
+        </select>
+
+        <select id="team2">
+            <option value="Argentina">🇦🇷 Argentina</option>
+            <option value="Brasil">🇧🇷 Brasil</option>
+            <option value="França">🇫🇷 França</option>
+            <option value="Alemanha">🇩🇪 Alemanha</option>
+            <option value="Espanha">🇪🇸 Espanha</option>
+            <option value="Inglaterra">🏴 Inglaterra</option>
+            <option value="Itália">🇮🇹 Itália</option>
+            <option value="Portugal">🇵🇹 Portugal</option>
+        </select>
+    </div>
+
+    <div>
+        <button onclick="startGame()">Iniciar Jogo</button>
+        <button onclick="pauseGame()">Pausar</button>
+        <button onclick="resetGame()">Reiniciar</button>
+    </div>
+
+    <div class="scoreboard">
+        <div class="teams">
+            <div class="team">
+                <img id="logo1" src="" alt="Time 1" />
+                <div id="name1"></div>
+                <div id="score1" class="score">0</div>
+            </div>
+            <div class="vs">VS</div>
+            <div class="team">
+                <img id="logo2" src="" alt="Time 2" />
+                <div id="name2"></div>
+                <div id="score2" class="score">0</div>
+            </div>
+        </div>
+        <div class="timer">⏱️ Tempo: <span id="time">00:00</span></div>
+    </div>
+
+    <h3>📜 Relato da Partida:</h3>
+    <div class="log" id="log"></div>
+
+    <audio id="crowd" src="https://www.soundjay.com/human/crowd-cheer-01.mp3"></audio>
+    <audio id="whistleStart" src="https://www.soundjay.com/button/sounds/beep-01a.mp3"></audio>
+    <audio id="whistleEnd" src="https://www.soundjay.com/button/sounds/beep-07.mp3"></audio>
+
+    <script>
+        const logos = {
+            "Brasil": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Brazilian_Football_Confederation_logo.svg/150px-Brazilian_Football_Confederation_logo.svg.png",
+            "Argentina": "https://upload.wikimedia.org/wikipedia/pt/f/fc/230px-Afa_logo.svg.png?20230513164804",
+            "França": "https://upload.wikimedia.org/wikipedia/pt/thumb/2/25/Logo_Sele%C3%A7%C3%A3o_Francesa_2018.png/120px-Logo_Sele%C3%A7%C3%A3o_Francesa_2018.png",
+            "Alemanha": "https://upload.wikimedia.org/wikipedia/pt/a/a9/DFBEagle.png",
+            "Espanha": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Escudo_de_Espa%C3%B1a_%28variant%29.svg/120px-Escudo_de_Espa%C3%B1a_%28variant%29.svg.png",
+            "Inglaterra": "https://upload.wikimedia.org/wikipedia/en/thumb/8/8b/England_national_football_team_crest.svg/250px-England_national_football_team_crest.svg.png",
+            "Itália": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Federazione_Italiana_Giuoco_Calcio%2C_Logo_2017%2C_4_stars.svg/500px-Federazione_Italiana_Giuoco_Calcio%2C_Logo_2017%2C_4_stars.svg.png",
+            "Portugal": "https://upload.wikimedia.org/wikipedia/pt/thumb/7/75/Portugal_FPF.png/250px-Portugal_FPF.png"
+        };
+
+        let score1 = 0;
+        let score2 = 0;
+        let timer = 0; // segundos
+        let interval;
+        const maxTime = 90 * 60; // 90 minutos em segundos
+        const log = document.getElementById("log");
+        const crowdSound = document.getElementById("crowd");
+
+        function updateTimerDisplay() {
+            const minutes = String(Math.floor(timer / 60)).padStart(2, '0');
+            const seconds = String(timer % 60).padStart(2, '0');
+            document.getElementById("time").innerText = `${minutes}:${seconds}`;
+        }
+
+        function startGame() {
+            const team1 = document.getElementById("team1").value;
+            const team2 = document.getElementById("team2").value;
+
+            if (team1 === team2) {
+                alert("Escolha times diferentes!");
+                return;
+            }
+
+            document.getElementById("logo1").src = logos[team1];
+            document.getElementById("logo2").src = logos[team2];
+            document.getElementById("name1").innerText = team1;
+            document.getElementById("name2").innerText = team2;
+
+            if (!interval) {
+                document.getElementById("whistleStart").play();
+                interval = setInterval(() => {
+                    timer++;
+                    updateTimerDisplay();
+
+                    // Probabilidades de gol a cada segundo (5% chance)
+                    if (Math.random() < 0.05) {
+                        score1++;
+                        document.getElementById("score1").innerText = score1;
+                        logEvent(`${team1} fez um GOL!`);
+                        crowdSound.play();
+                    }
+
+                    if (Math.random() < 0.05) {
+                        score2++;
+                        document.getElementById("score2").innerText = score2;
+                        logEvent(`${team2} fez um GOL!`);
+                        crowdSound.play();
+                    }
+
+                    if (timer >= maxTime) {
+                        clearInterval(interval);
+                        interval = null;
+                        logEvent("⏰ Fim de jogo!");
+                        document.getElementById("whistleEnd").play();
+                    }
+                }, 1000);
+            }
+        }
+
+        function pauseGame() {
+            if (interval) {
+                clearInterval(interval);
+                interval = null;
+                logEvent("⏸️ Jogo pausado.");
+            }
+        }
+
+        function resetGame() {
+            clearInterval(interval);
+            interval = null;
+            score1 = 0;
+            score2 = 0;
+            timer = 0;
+            document.getElementById("score1").innerText = "0";
+            document.getElementById("score2").innerText = "0";
+            updateTimerDisplay();
+            log.innerHTML = "";
+            logEvent("🔄 Jogo reiniciado.");
+        }
+
+        function logEvent(message) {
+            const p = document.createElement("p");
+            const minutes = String(Math.floor(timer / 60)).padStart(2, '0');
+            const seconds = String(timer % 60).padStart(2, '0');
+            p.innerText = `[${minutes}:${seconds}] ${message}`;
+            log.appendChild(p);
+            log.scrollTop = log.scrollHeight;
+        }
+    </script>
+
+</body>
+</html>
