@@ -1,0 +1,115 @@
+/* Estilo para o placar (scoreboard) */
+.scoreboard {
+    background-color: #004d40;
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 20px;
+    display: inline-block;
+    min-width: 450px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.teams {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.team {
+    width: 150px;
+}
+
+.team img {
+    width: 80px;
+    height: 80px;
+    display: block;
+    margin: 0 auto 8px auto;
+    border-radius: 50%;
+    border: 3px solid #ffeb3b;
+    background: #fff;
+}
+
+.vs {
+    font-size: 28px;
+    font-weight: bold;
+    color: #ffc107;
+    margin: 0 20px;
+}
+
+.score {
+    font-size: 48px;
+    font-weight: bold;
+    color: #ffeb3b;
+    text-shadow: 0 0 10px #fff700, 2px 2px 4px #333;
+    margin-top: 8px;
+    transition: transform 0.2s;
+}
+
+.scoreboard .score:hover {
+    transform: scale(1.1);
+}
+
+.timer {
+    font-size: 26px;
+    margin: 10px 0;
+    color: #fff;
+    letter-spacing: 2px;
+    animation: pisca-timer 1s infinite;
+}
+
+/* Efeito de brilho no placar */
+
+/* Animação para o timer */
+@keyframes pisca-timer {
+    0% { color: #fff; }
+    50% { color: #ffeb3b; }
+    100% { color: #fff; }
+}
+
+/* Destaque para o time vencedor */
+.team.winner {
+    border: 3px solid #00e676;
+    box-shadow: 0 0 10px #00e676;
+    background: #263238;
+    border-radius: 15px;
+    transition: box-shadow 0.3s;
+}
+
+/* Botões mais modernos */
+button {
+    background: linear-gradient(90deg, #00c853 60%, #ffd600 100%);
+    color: #222;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 22px;
+    margin: 10px;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: background 0.3s, color 0.3s;
+}
+
+button:hover {
+    background: linear-gradient(90deg, #ffd600 60%, #00c853 100%);
+    color: #004d40;
+}
+
+/* Responsividade para o placar */
+@media (max-width: 600px) {
+    .scoreboard {
+        min-width: 90vw;
+        padding: 10px;
+    }
+    .teams {
+        flex-direction: column;
+    }
+    .team {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .vs {
+        margin: 10px 0;
+    }
+}

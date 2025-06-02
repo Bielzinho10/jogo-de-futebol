@@ -96,6 +96,22 @@
             font-weight: bold;
             color: #ffeb3b;
         }
+
+        .winner {
+            border: 2px solid #ffeb3b;
+            padding: 5px;
+            border-radius: 10px;
+            animation: winAnimation 1s forwards;
+        }
+
+        @keyframes winAnimation {
+            from {
+                transform: scale(1);
+            }
+            to {
+                transform: scale(1.1);
+            }
+        }
     </style>
 </head>
 <body>
@@ -130,6 +146,10 @@
         <button onclick="startGame()">Iniciar Jogo</button>
         <button onclick="pauseGame()">Pausar</button>
         <button onclick="resetGame()">Reiniciar</button>
+        <button onclick="addGoal(1)">Gol Time 1</button>
+        <button onclick="addGoal(2)">Gol Time 2</button>
+        <button onclick="addCard(1)">Cartão Time 1</button>
+        <button onclick="addCard(2)">Cartão Time 2</button>
     </div>
 
     <div class="scoreboard">
@@ -222,6 +242,7 @@
                         interval = null;
                         logEvent("⏰ Fim de jogo!");
                         document.getElementById("whistleEnd").play();
+                        highlightWinner();
                     }
                 }, 1000);
             }
@@ -246,6 +267,10 @@
             updateTimerDisplay();
             log.innerHTML = "";
             logEvent("🔄 Jogo reiniciado.");
+            document.querySelector('.team:nth-child(1)').classList.remove('winner');
+            document.querySelector('.team:nth-child(3)').classList.remove('winner');
+            const final = document.getElementById('finalScore');
+            if (final) final.remove();
         }
 
         function logEvent(message) {
@@ -255,6 +280,70 @@
             p.innerText = `[${minutes}:${seconds}] ${message}`;
             log.appendChild(p);
             log.scrollTop = log.scrollHeight;
+        }
+
+        function addGoal(team) {
+            if (interval) {
+                if (team === 1) {
+                    score1++;
+                    document.getElementById("score1").innerText = score1;
+                    animateGoal("score1");
+                    logEvent(document.getElementById("name1").innerText + " fez um GOL!");
+                    crowdSound.play();
+                } else {
+                    score2++;
+                    document.getElementById("score2").innerText = score2;
+                    animateGoal("score2");
+                    logEvent(document.getElementById("name2").innerText + " fez um GOL!");
+                    crowdSound.play();
+                }
+            }
+        }
+
+        function addCard(team) {
+            if (!interval) return;
+            const tipo = Math.random() < 0.7 ? "🟨 Amarelo" : "🟥 Vermelho";
+            const nome = team === 1 ? document.getElementById("name1").innerText : document.getElementById("name2").innerText;
+            logEvent(`${nome} recebeu cartão ${tipo}!`);
+        }
+
+        function animateGoal(scoreId) {
+            const el = document.getElementById(scoreId);
+            el.style.transform = "scale(1.3)";
+            setTimeout(() => {
+                el.style.transform = "scale(1)";
+            }, 300);
+        }
+
+        function highlightWinner() {
+            const team1Div = document.querySelector('.team:nth-child(1)');
+            const team2Div = document.querySelector('.team:nth-child(3)');
+            team1Div.classList.remove('winner');
+            team2Div.classList.remove('winner');
+            if (score1 > score2) {
+                team1Div.classList.add('winner');
+                logEvent("🏆 " + document.getElementById("name1").innerText + " venceu!");
+            } else if (score2 > score1) {
+                team2Div.classList.add('winner');
+                logEvent("🏆 " + document.getElementById("name2").innerText + " venceu!");
+            } else {
+                logEvent("🤝 Empate!");
+            }
+            showFinalScore();
+        }
+
+        function showFinalScore() {
+            let final = document.getElementById('finalScore');
+            if (!final) {
+                final = document.createElement('div');
+                final.id = 'finalScore';
+                final.style.fontSize = '22px';
+                final.style.marginTop = '15px';
+                final.style.color = '#ffd600';
+                final.style.fontWeight = 'bold';
+                document.querySelector('.scoreboard').appendChild(final);
+            }
+            final.innerText = `Placar Final: ${document.getElementById("name1").innerText} ${score1} x ${score2} ${document.getElementById("name2").innerText}`;
         }
     </script>
 
